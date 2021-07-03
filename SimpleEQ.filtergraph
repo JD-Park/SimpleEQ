@@ -65,7 +65,7 @@
           uiLastY_Normal="140" uiopen_Normal="1">
     <PLUGIN name="SimpleEQ" format="VST3" category="Fx" manufacturer="yourcompany"
             version="1.0.0" file="C:\Users\jeffp\Desktop\Programming\SimpleEQ\Builds\VisualStudio2019\x64\Release\VST3\SimpleEQ.vst3"
-            uid="e953352d" isInstrument="0" fileTime="17a5254bb79" infoUpdateTime="17a577be269"
+            uid="e953352d" isInstrument="0" fileTime="17a5254bb79" infoUpdateTime="17a6c374793"
             numInputs="2" numOutputs="2" isShell="0"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
     <LAYOUT>
@@ -77,11 +77,11 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="6" x="0.45125" y="0.3689516129032258" uiLastX_Normal="163"
-          uiLastY_Normal="512" uiopen_Normal="1">
-    <PLUGIN name="Audio File Player Plugin" format="VST3" category="Fx|Tools"
-            manufacturer="Spyced Concepts" version="1.0.0" file="C:\Users\jeffp\Desktop\Programming\AudioFilePlayerPlugin\Builds\VisualStudio2019\x64\Release\VST3\AudioFilePlayerPlugin.vst3"
-            uid="e952be97" isInstrument="0" fileTime="17a57784421" infoUpdateTime="17a577be269"
+  <FILTER uid="7" x="0.39375" y="0.3407258064516129" uiLastX_Normal="213"
+          uiLastY_Normal="553" uiopen_Normal="1">
+    <PLUGIN name="Audio Player" format="VST3" category="Fx|Tools" manufacturer="yourcompany"
+            version="1.0.0" file="C:\Users\jeffp\Desktop\Programming\Audio Player\Builds\VisualStudio2019\x64\Release\VST3\Audio Player.vst3"
+            uid="e958dc28" isInstrument="0" fileTime="17a6c354d7e" infoUpdateTime="17a6c374793"
             numInputs="2" numOutputs="2" isShell="0"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
     <LAYOUT>
@@ -95,6 +95,6 @@
   </FILTER>
   <CONNECTION srcFilter="5" srcChannel="0" dstFilter="3" dstChannel="0"/>
   <CONNECTION srcFilter="5" srcChannel="1" dstFilter="3" dstChannel="1"/>
-  <CONNECTION srcFilter="6" srcChannel="0" dstFilter="5" dstChannel="0"/>
-  <CONNECTION srcFilter="6" srcChannel="1" dstFilter="5" dstChannel="1"/>
+  <CONNECTION srcFilter="7" srcChannel="0" dstFilter="5" dstChannel="0"/>
+  <CONNECTION srcFilter="7" srcChannel="1" dstFilter="5" dstChannel="1"/>
 </FILTERGRAPH>
