@@ -111,10 +111,10 @@ private:
 
         auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();*/
 
-        leftChain.template setBypassed<0>(true);
+        /*leftChain.template setBypassed<0>(true);
         leftChain.template setBypassed<1>(true);
         leftChain.template setBypassed<2>(true);
-        leftChain.template setBypassed<3>(true);
+        leftChain.template setBypassed<3>(true);*/
 
         switch (lowCutSlope)
         {
