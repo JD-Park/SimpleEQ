@@ -23,7 +23,6 @@ struct ChainSettings
     float peakFreq{ 0 }, peakGainInDecibles{ 0 }, peakQuality{ 1.0f };
     float lowCutFreq{ 0 }, highCutFreq{ 0 };
 
-
     Slope lowCutSlope { Slope::Slope_12 }, highCutSlope { Slope::Slope_12 };
 };
 
@@ -35,8 +34,6 @@ using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
 
 using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
 
-MonoChain leftChain, rightChain;
-
 enum ChainPositions
 {
     LowCut,
@@ -44,6 +41,10 @@ enum ChainPositions
     HighCut
 };
 
+using Coefficients = Filter::CoefficientsPtr;
+void updateCoefficients(Coefficients& old, const Coefficients& replacements);
+
+Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate);
 //==============================================================================
 /**
 */
@@ -91,10 +92,10 @@ public:
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout()};
 
 private:
+    MonoChain leftChain, rightChain;
 
     void updatePeakFilter(const ChainSettings& chainSettings);
-    using Coefficients = Filter::CoefficientsPtr;
-    static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
+
 
     template<int Index, typename ChainType, typename CoefficientType>
     void update(ChainType& chain, const CoefficientType& coefficients)
