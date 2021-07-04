@@ -92,8 +92,15 @@ private:
     using Coefficients = Filter::CoefficientsPtr;
     static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
 
-    template<typename Chaintype, typename CoefficientType>
-    void updateCutFilter(Chaintype& leftLowCut, 
+    template<int Index, typename ChainType, typename CoefficientType>
+    void update(ChainType& chain, const CoefficientType& cutCoefficients)
+    {
+        updateCoefficients(chain.template get<Index>().coefficients, cutCoefficients[Index]);
+        chain.template setBypassed<Index>(false);
+    }
+
+    template<typename ChainType, typename CoefficientType>
+    void updateCutFilter(ChainType& leftLowCut, 
         const CoefficientType& cutCoefficients,
         //const ChainSettings& chainSettings)
         const Slope& lowCutSlope)
@@ -111,7 +118,23 @@ private:
 
         switch (lowCutSlope)
         {
+            case Slope_48:
+            {
+                update<3>(leftLowCut, cutCoefficients);
+            }
+            case Slope_36:
+            {
+                update<2>(leftLowCut, cutCoefficients);
+            }
+            case Slope_24:
+            {
+                update<2>(leftLowCut, cutCoefficients);
+            }
             case Slope_12:
+            {
+                update<0>(leftLowCut, cutCoefficients);
+            }
+            /*case Slope_12:
             {
                 *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
                 leftLowCut.template setBypassed<0>(false);
@@ -146,7 +169,7 @@ private:
                 *leftLowCut.template get<3>().coefficients = *cutCoefficients[3];
                 leftLowCut.template setBypassed<3>(false);
                 break;
-            }
+            }*/
         }
     }
     //==============================================================================
