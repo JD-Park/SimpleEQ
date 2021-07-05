@@ -9,6 +9,58 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
+    float sliderPosProportional,
+    float rotaryStartAngle,
+    float rotaryEndAngle, juce::Slider& slider)
+{
+    using namespace juce;
+    auto bounds = Rectangle<float>(x, y, width, height);
+
+    g.setColour(Colour(60u, 86u, 125u));
+    g.fillEllipse(bounds);
+
+    g.setColour(Colour(90u, 114u, 150u));
+    g.drawEllipse(bounds, 2.0f);
+
+    auto center = bounds.getCentre();
+
+    Path p;
+    Rectangle<float> r;
+    r.setLeft(center.getX() - 2);
+    r.setRight(center.getX() + 2);
+    r.setTop(bounds.getY());
+    r.setBottom(center.getY());
+
+    p.addRectangle(r);
+    jassert(rotaryStartAngle < rotaryEndAngle);
+
+    auto sliderAngRad = jmap(sliderPosProportional, 0.0f, 1.0f, rotaryStartAngle, rotaryEndAngle);
+
+    p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY()));
+
+    g.fillPath(p);
+}
+
+void RotarySliderWithLabels::paint(juce::Graphics& g)
+{
+    using namespace juce;
+    auto startAng = degreesToRadians(180.0f + 45.0f);
+    auto endAng = degreesToRadians(180.0f - 45.0f) + MathConstants<float>::twoPi;
+
+    auto range = getRange();
+    auto sliderBounds = getSliderBounds();
+
+    getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(),
+        sliderBounds.getY(), sliderBounds.getWidth(), sliderBounds.getHeight(), jmap(getValue(),
+            range.getStart(), range.getEnd(), 0.0, 1.0), startAng, endAng, *this);
+}
+
+juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
+{
+    return getLocalBounds();
+}
+
 ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p)
 {
     const auto& params = audioProcessor.getParameters();
@@ -134,10 +186,10 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
 
-    g.setColour(Colours::orange);
-    g.drawRoundedRectangle(responseArea.toFloat(), 4.0f, 1.0f);
+    g.setColour(Colour(90u, 114u, 150u));
+    g.drawRoundedRectangle(responseArea.toFloat(), 4.0f, 4.0f);
 
-    g.setColour(Colours::white);
+    g.setColour(Colour(179u, 196u, 224u));
     g.strokePath(responseCurve, PathStrokeType(2.0f));
 }
 
@@ -181,7 +233,7 @@ void SimpleEQAudioProcessorEditor::paint(juce::Graphics& g)
 {
     using namespace juce;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll(Colours::black);
+    g.fillAll(Colour(1u, 31u, 75u));
 }
     
 void SimpleEQAudioProcessorEditor::resized()
