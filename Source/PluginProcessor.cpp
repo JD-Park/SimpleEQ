@@ -306,7 +306,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout SimpleEQAudioProcessor::crea
     {
         juce::String str;
         str << (12 + i * 12);
-        str << "db/Oct";
+        str << " db/Oct";
         stringArray.add(str);
     }
     layout.add(std::make_unique<juce::AudioParameterChoice>("Low-Cut Slope", "Low-Cut Slope", stringArray, 0));
