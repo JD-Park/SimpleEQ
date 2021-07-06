@@ -215,11 +215,18 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     //g.fillAll(Colours::black);
 
-    g.drawImage(background, getRenderArea().toFloat());
+    auto imageArea = getLocalBounds();
+
+    //imageArea.removeFromTop(12);
+    //imageArea.removeFromBottom(2);
+    //imageArea.removeFromLeft(20);
+    //imageArea.removeFromRight(20);
+
+    g.drawImage(background, imageArea.toFloat());
 
     //auto responseArea = getLocalBounds();
     //auto responseArea = getRenderArea();
-    auto responseArea = getImageArea();
+    auto responseArea = getAnalysisArea();
 
     auto w = responseArea.getWidth();
 
@@ -288,7 +295,7 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
         return jmap(input, -24.0, 24.0, outputMin, outputMax);
     };
 
-    responseCurve.startNewSubPath(responseArea.getX() + 5, map(mags.front()));
+    responseCurve.startNewSubPath(responseArea.getX(), map(mags.front()));
 
     for (size_t i = 1; i < mags.size(); ++i)
     {
@@ -311,9 +318,9 @@ void ResponseCurveComponent::resized()
 
     Array<float> freqs
     {
-        20, 30, 40, 50, 100,
-        200, 300, 400, 500, 1000,
-        2000, 3000, 4000, 5000, 10000,
+        20, /*30, 40,*/ 50, 100,
+        200, /*300, 400,*/ 500, 1000,
+        2000, /*3000, 4000,*/ 5000, 10000,
         20000, 
     };
 
@@ -331,7 +338,7 @@ void ResponseCurveComponent::resized()
         xs.add(left + width * normX);
     }
 
-    g.setColour(Colour(60u, 86u, 125u));
+    g.setColour( Colour(60u, 86u, 125u));
     for (auto x : xs)
     {
         g.drawVerticalLine(x, top, bottom);
@@ -350,6 +357,39 @@ void ResponseCurveComponent::resized()
     }
 
     //g.drawRect(getAnalysisArea());
+
+    g.setColour(Colour(151u, 132u, 0));
+    const int fontHeight = 10;
+    g.setFont(fontHeight);
+
+    for (int i = 0; i < freqs.size(); ++i)
+    {
+        auto f = freqs[i];
+        auto x = xs[i];
+
+        bool addK = false;
+        String str;
+        if (f > 999.f)
+        {
+            addK = true;
+            f /= 1000.f;
+        }
+
+        str << f;
+        if (addK)
+            str << "k";
+        str << "Hz";
+
+        auto textWidth = g.getCurrentFont().getStringWidth(str);
+
+        Rectangle<int> r;
+
+        r.setSize(textWidth, fontHeight);
+        r.setCentre(x, 0);
+        r.setY(1);
+
+        g.drawFittedText(str, r, juce::Justification::centred, 1);
+    }
 }
 
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
@@ -365,23 +405,12 @@ juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
     return bounds;
 }
 
-juce::Rectangle<int> ResponseCurveComponent::getImageArea()
-{
-    auto bounds = getLocalBounds();
-
-    bounds.reduce(5, 5);
-
-    return bounds;
-}
-
-
 juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
 {
-    auto bounds = getImageArea();
+    auto bounds = getRenderArea();
 
-    //auto bounds = getLocalBounds();
-    //bounds.reduce(10, 10);
-
+    bounds.removeFromTop(4);
+    bounds.removeFromBottom(4);
     return bounds;
 }
 
@@ -434,7 +463,7 @@ highCutSlopeSliderAttachment(audioProcessor.apvts, "High-Cut Slope", highCutSlop
         addAndMakeVisible(comps);
     }    
 
-    setSize (600, 480);
+    setSize (800, 600);
 }
 
 SimpleEQAudioProcessorEditor::~SimpleEQAudioProcessorEditor()
