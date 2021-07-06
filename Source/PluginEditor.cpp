@@ -159,13 +159,17 @@ juce::String RotarySliderWithLabels::getDisplayString() const
     return str;
 }
 
-ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p)
+ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p),
+leftChannelFifo(&audioProcessor.leftChannelFifo)
 {
     const auto& params = audioProcessor.getParameters();
     for (auto param : params)
     {
         param->addListener(this);
     }
+
+    leftChannelFFTDataGenerator.changeOrder(FFTOrder::order2048);
+    monoBuffer.setSize(1, leftChannelFFTDataGenerator.getFFTSize());
 
     updateChain();
 
@@ -187,13 +191,53 @@ ResponseCurveComponent::~ResponseCurveComponent()
 
 void ResponseCurveComponent::timerCallback()
 {
+    juce::AudioBuffer<float> tempIncomingBuffer;
+
+    while (leftChannelFifo->getNumCompleteBuffersAvailable() > 0)
+    {
+        if (leftChannelFifo->getAudioBuffer(tempIncomingBuffer))
+        {
+            auto size = tempIncomingBuffer.getNumSamples();
+
+            juce::FloatVectorOperations::copy(monoBuffer.getWritePointer(0, 0),
+                monoBuffer.getReadPointer(0, size),
+                monoBuffer.getNumSamples() - size);
+
+            juce::FloatVectorOperations::copy(monoBuffer.getWritePointer(0, monoBuffer.getNumSamples() - size),
+                tempIncomingBuffer.getReadPointer(0, 0),
+                size);
+            
+            leftChannelFFTDataGenerator.produceFFTDataForRendering(monoBuffer, -48.0f);
+        }
+    }
+
+    const auto fftBounds = getAnalysisArea().toFloat();
+    const auto fftSize = leftChannelFFTDataGenerator.getFFTSize();
+    const auto binWidth = audioProcessor.getSampleRate() / (double)fftSize;
+
+    while (leftChannelFFTDataGenerator.getNumAvailableFFTDataBlocks() > 0)
+    {
+        std::vector<float> fftData;
+        if (leftChannelFFTDataGenerator.getFFTData(fftData))
+        {
+            pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, -48.0f);
+        }
+    }
+
+    while (pathProducer.getNumPathsAvailable())
+    {
+        pathProducer.getPath(leftChannelFFTPath);
+    }
+
     if (parametersChanged.compareAndSetBool(false, true));
     {
         //update the monochain
         updateChain();
         //signal a repaint
-        repaint();
+        //repaint();
     }
+
+    repaint();
 }
 
 void ResponseCurveComponent::updateChain()
@@ -301,6 +345,9 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     {
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
+
+    g.setColour(Colours::white);
+    g.strokePath(leftChannelFFTPath, PathStrokeType(1.0f));
 
     g.setColour(Colour(90u, 114u, 150u));
     g.drawRoundedRectangle(getRenderArea().toFloat(), 4.0f, 4.0f);
