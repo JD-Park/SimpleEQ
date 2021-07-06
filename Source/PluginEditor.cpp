@@ -390,6 +390,38 @@ void ResponseCurveComponent::resized()
 
         g.drawFittedText(str, r, juce::Justification::centred, 1);
     }
+
+    //auto gain = getGains();
+
+    for (auto gDb : gain)
+    {
+        auto y = jmap(gDb, -24.f, 24.f, float(bottom), float(top));
+
+        String str;
+        if (gDb > 0)
+            str << "+";
+        str << gDb;
+
+        auto textWidth = g.getCurrentFont().getStringWidth(str);
+
+        Rectangle<int> r;
+        r.setSize(textWidth, fontHeight);
+        r.setX(getWidth() - textWidth);
+        r.setCentre(r.getCentreX(), y);
+
+        g.setColour(gDb == 0.f ? Colour(151u, 132u, 0u) : Colours::white);
+
+        g.drawFittedText(str, r, juce::Justification::centredLeft, 1);
+
+        str.clear();
+        str << (gDb - 24.f);
+
+        r.setX(1);
+        textWidth = g.getCurrentFont().getStringWidth(str);
+        r.setSize(textWidth, fontHeight);
+        g.setColour(Colours::lightgrey);
+        g.drawFittedText(str, r, juce::Justification::centredLeft, 1);
+    }
 }
 
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
@@ -463,7 +495,7 @@ highCutSlopeSliderAttachment(audioProcessor.apvts, "High-Cut Slope", highCutSlop
         addAndMakeVisible(comps);
     }    
 
-    setSize (800, 600);
+    setSize (600, 480);
 }
 
 SimpleEQAudioProcessorEditor::~SimpleEQAudioProcessorEditor()
